@@ -1,30 +1,38 @@
 import { useRef } from 'react'
-import type { CSSProperties, PointerEvent } from 'react'
+import type { PointerEvent } from 'react'
+import type { Decor } from '../model/decor.ts'
 import type { Knobs, PedalDef } from '../model/types.ts'
 import { Board } from './Board.tsx'
-import { Knob } from './Knob.tsx'
+import { PedalFace } from './PedalFace.tsx'
 
 interface PedalVisualProps {
   pedal: PedalDef
+  decor: Decor
   knobs: Knobs
   bypass: boolean
   flipped: boolean
+  decorating: boolean
   selectedRef: string | null
+  activeStage: string | null
   showValues: boolean
   highlightRef?: string | null
+  selectedSticker: string | null
   onKnob: (id: string, value: number) => void
   onToggleBypass: () => void
   onSelect: (ref: string | null) => void
+  onSelectSticker: (id: string | null) => void
+  onMoveSticker: (id: string, x: number, y: number) => void
+  onRemoveSticker: (id: string) => void
 }
 
 /** Pedal en 3D: de frente con perillas y pisón; dado vuelta, la placa con sus componentes. */
-export function PedalVisual({ pedal, knobs, bypass, flipped, selectedRef, showValues, highlightRef, onKnob, onToggleBypass, onSelect }: PedalVisualProps) {
+export function PedalVisual(p: PedalVisualProps) {
   const scene = useRef<HTMLDivElement>(null)
 
-  // Inclinación leve según dónde está el mouse (solo cuando no se está arrastrando una perilla).
+  // Inclinación leve según dónde está el mouse (solo cuando no se está arrastrando nada).
   function tilt(e: PointerEvent<HTMLDivElement>) {
     const el = scene.current
-    if (!el || e.buttons !== 0) return
+    if (!el || e.buttons !== 0 || p.decorating) return
     const r = el.getBoundingClientRect()
     const x = (e.clientX - r.left) / r.width - 0.5
     const y = (e.clientY - r.top) / r.height - 0.5
@@ -36,45 +44,34 @@ export function PedalVisual({ pedal, knobs, bypass, flipped, selectedRef, showVa
     scene.current?.style.setProperty('--ty', '0deg')
   }
 
+  const cls = ['scene', `shape-${p.pedal.look.shape}`, p.flipped ? 'flipped' : '', p.decorating ? 'decorating' : ''].filter(Boolean).join(' ')
+
   return (
     <div className="stage3d" onPointerMove={tilt} onPointerLeave={untilt}>
       <div className="pedalboard-bg" aria-hidden="true" />
-      <div ref={scene} className={flipped ? 'scene flipped' : 'scene'} style={{ '--pc': pedal.color } as CSSProperties}>
+      <div ref={scene} className={cls}>
         <div className="flipper">
-          <div className="face front">
-            <div className="jack jack-l" aria-hidden="true">
-              <span>IN</span>
-            </div>
-            <div className="jack jack-r" aria-hidden="true">
-              <span>OUT</span>
-            </div>
-            <div className="screw s1" aria-hidden="true" />
-            <div className="screw s2" aria-hidden="true" />
-            <div className="knob-row">
-              {pedal.knobs.map((k) => (
-                <Knob key={k.id} label={k.label} value={knobs[k.id] ?? k.default} onChange={(v) => onKnob(k.id, v)} />
-              ))}
-            </div>
-            <div className="nameplate">
-              <div className="nameplate-title">{shortName(pedal)}</div>
-              <div className="nameplate-sub">{pedal.subtitle}</div>
-            </div>
-            <span className={bypass ? 'led3d' : 'led3d on'} aria-hidden="true" />
-            <button className="stomp" onClick={onToggleBypass} aria-pressed={!bypass} aria-label={bypass ? 'Prender el pedal' : 'Apagar el pedal (bypass)'}>
-              <span className="stomp-top" />
-            </button>
-          </div>
+          <PedalFace
+            pedal={p.pedal}
+            decor={p.decor}
+            knobs={p.knobs}
+            bypass={p.bypass}
+            interactive
+            onKnob={p.onKnob}
+            onToggleBypass={p.onToggleBypass}
+            decorating={p.decorating}
+            selectedSticker={p.selectedSticker}
+            onSelectSticker={p.onSelectSticker}
+            onMoveSticker={p.onMoveSticker}
+            onRemoveSticker={p.onRemoveSticker}
+          />
           <div className="face back">
             <div className="back-frame">
-              <Board pedal={pedal} selectedRef={selectedRef} onSelect={onSelect} showValues={showValues} highlightRef={highlightRef} />
+              <Board pedal={p.pedal} selectedRef={p.selectedRef} onSelect={p.onSelect} showValues={p.showValues} highlightRef={p.highlightRef} activeStage={p.activeStage} />
             </div>
           </div>
         </div>
       </div>
     </div>
   )
-}
-
-function shortName(pedal: PedalDef): string {
-  return pedal.name.replace(/^Overdrive tipo /, '').replace(/^Fuzz tipo /, '')
 }

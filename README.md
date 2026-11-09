@@ -29,6 +29,7 @@ src/audio/chord.ts                   Acorde de guitarra sintetizado (Karplus-Str
 src/audio/engine.ts                  Conecta todo en el navegador (Web Audio).
 src/components/                      Interfaz (React): PedalVisual (3D), Board (placa), GamePanel, Spectrum…
 src/model/board.ts, game.ts          Placa, fallas, multímetro y averías del juego.
+src/model/decor.ts                   Decoración: colores, acabados, stickers, validación y guardado local.
 tests/                               Pruebas con el test runner de Node.
 ```
 
@@ -38,7 +39,17 @@ la lista de materiales y el esquemático. Para sumar el Big Muff o el Fuzz Face 
 
 Convención de escala del audio: 1,0 digital = 1 V. La "pegada" del acorde va de unos 50 mV a 500 mV de pico.
 
+## Pantallas
+
+- **Inicio**: una pedalera con los tres pedales cableados entre la guitarra y el ampli. Se abre el Tube Screamer; el Big Muff y el Fuzz Face
+  aparecen como "Próximamente". Cada pedal se dibuja con la decoración que le hayas puesto.
+- **Banco de trabajo**: el pedal en 3D (se inclina con el mouse y se da vuelta para ver la placa) y, a la derecha, lo que corresponda al modo.
+
 ## Modos
+
+- **Decorar**: color y acabado (esmalte, metalizado, mate), dibujos (rayas, puntos, cuadros, rombos), perillas (negras, blancas, cromadas,
+  doradas, rojas), nombre y subtítulo de la chapa, color del LED y stickers (14 tipos, incluido uno de texto) que se arrastran, giran y
+  cambian de tamaño. Se guarda en el navegador (`localStorage`); se puede volver al pedal de fábrica.
 
 - **Taller**: perillas, espectro en vivo, respuesta en frecuencia y el circuito etapa por etapa con las cuentas. Podés dar vuelta el pedal para ver
   la placa, tocar un componente (qué es, qué valor tiene) y simular que se abre o se pone en corto para escuchar qué le pasa al sonido.
@@ -50,6 +61,9 @@ Convención de escala del audio: 1,0 digital = 1 V. La "pegada" del acorde va de
 - El modelo del Tube Screamer pone los diodos **dentro de la realimentación** del operacional (ganancia 1 + Zf/Zg), con la ecuación de Shockley
   (parámetros típicos de un 1N914), sobremuestreo ×4 y filtro anti-alias. Las pruebas comparan el procesador contra la respuesta calculada
   con las fórmulas (diferencias de décimas de dB en señal chica).
+- El aspecto del Tube Screamer (esmalte verde, tres perillas arriba, chapa y pisón) es un diseño propio inspirado en ese tipo de pedal; no copia logos ni
+  tipografías de ningún fabricante. El "Ajuste tipo SRV" (Drive bajo, Level alto, Tone medio-alto) sale de lo que cuentan varias fuentes sobre cómo lo
+  usaba Stevie Ray Vaughan, que no coinciden en los números exactos ni en si era un TS808 o un TS9: es un punto de partida.
 - El control de tono es una **reconstrucción**: no está verificado el cableado exacto del potenciómetro ni los designadores R9/R10, y la
   disposición de la placa dibujada es ilustrativa. Los demás valores (Rg, Cg, Rf, Drive, Cf, R7/C5, R8/C6, potenciómetros) coinciden con análisis publicados.
 - No se modelan ruido, ancho de banda del operacional, etapa de entrada, buffer de salida, bypass ni batería.

@@ -68,13 +68,13 @@ export function drawSpectrum(g: CanvasRenderingContext2D, width: number, height:
   const yOf = (db: number) => M.t + ((SPEC_DB_MAX - Math.min(SPEC_DB_MAX, Math.max(SPEC_DB_MIN, db))) / (SPEC_DB_MAX - SPEC_DB_MIN)) * plotH
 
   g.clearRect(0, 0, width, height)
-  g.fillStyle = '#12151a'
+  g.fillStyle = '#0f0d26'
   g.fillRect(0, 0, width, height)
 
   g.font = '11px system-ui, sans-serif'
   g.lineWidth = 1
-  g.strokeStyle = '#2c313a'
-  g.fillStyle = '#8a919b'
+  g.strokeStyle = 'rgba(255,255,255,0.12)'
+  g.fillStyle = '#b3afd6'
   g.textAlign = 'right'
   for (let db = SPEC_DB_MIN; db <= SPEC_DB_MAX; db += 20) {
     g.beginPath()
@@ -102,15 +102,15 @@ export function drawSpectrum(g: CanvasRenderingContext2D, width: number, height:
         if (c === 0) g.moveTo(x, yOf(peaks[c]))
         else g.lineTo(x, yOf(peaks[c]))
       }
-      g.strokeStyle = '#8a919b'
+      g.strokeStyle = '#00e0ff'
       g.lineWidth = 1.5
       g.stroke()
     }
     if (frame.output) {
       const peaks = columnPeaks(frame.output, frame.sampleRate, columns)
       const gradient = g.createLinearGradient(0, M.t, 0, M.t + plotH)
-      gradient.addColorStop(0, 'rgba(90,209,127,0.75)')
-      gradient.addColorStop(1, 'rgba(90,209,127,0.05)')
+      gradient.addColorStop(0, 'rgba(61,255,138,0.8)')
+      gradient.addColorStop(1, 'rgba(0,224,255,0.06)')
       g.beginPath()
       g.moveTo(M.l, M.t + plotH)
       for (let c = 0; c < columns; c++) g.lineTo(M.l + c + 0.5, yOf(peaks[c]))
@@ -124,19 +124,19 @@ export function drawSpectrum(g: CanvasRenderingContext2D, width: number, height:
         if (c === 0) g.moveTo(x, yOf(peaks[c]))
         else g.lineTo(x, yOf(peaks[c]))
       }
-      g.strokeStyle = '#5ad17f'
+      g.strokeStyle = '#3dff8a'
       g.lineWidth = 1.5
       g.stroke()
     }
   }
 
   g.textAlign = 'left'
-  g.fillStyle = '#c4cad2'
+  g.fillStyle = '#f2f0ff'
   g.fillText(text, M.l + 6, M.t + 14)
-  g.fillStyle = '#8a919b'
+  g.fillStyle = '#00e0ff'
   g.fillRect(width - 190, M.t + 6, 14, 3)
   g.fillText('entra', width - 172, M.t + 11)
-  g.fillStyle = '#5ad17f'
+  g.fillStyle = '#3dff8a'
   g.fillRect(width - 120, M.t + 6, 14, 3)
   g.fillText('sale del pedal', width - 102, M.t + 11)
 }

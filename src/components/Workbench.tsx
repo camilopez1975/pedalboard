@@ -7,10 +7,12 @@ import { compilePedal } from '../model/compile.ts'
 import { getScenario } from '../model/game.ts'
 import type { Fault, PedalDef } from '../model/types.ts'
 import { useApp } from '../store.ts'
+import { DecorPanel } from './DecorPanel.tsx'
 import { ComponentInfo } from './ComponentInfo.tsx'
 import { GamePanel } from './GamePanel.tsx'
 import { PedalVisual } from './PedalVisual.tsx'
 import { ResponseChart } from './ResponseChart.tsx'
+import { SignalFlow } from './SignalFlow.tsx'
 import { Spectrum } from './Spectrum.tsx'
 import { StageCard } from './StageCard.tsx'
 
@@ -29,6 +31,13 @@ export function Workbench({ pedal }: WorkbenchProps) {
   const selectedRef = useApp((s) => s.selectedRef)
   const sandboxFault = useApp((s) => s.sandboxFault)
   const game = useApp((s) => s.game)
+  const decor = useApp((s) => s.decor[pedal.id])
+  const selectedSticker = useApp((s) => s.selectedSticker)
+  const hoverStage = useApp((s) => s.hoverStage)
+  const updateSticker = useApp((s) => s.updateSticker)
+  const removeSticker = useApp((s) => s.removeSticker)
+  const selectSticker = useApp((s) => s.selectSticker)
+  const setKnobs = useApp((s) => s.setKnobs)
   const setKnob = useApp((s) => s.setKnob)
   const setBypass = useApp((s) => s.setBypass)
   const setChord = useApp((s) => s.setChord)
@@ -39,6 +48,7 @@ export function Workbench({ pedal }: WorkbenchProps) {
   const selectRef = useApp((s) => s.selectRef)
   const closePedal = useApp((s) => s.closePedal)
   const [error, setError] = useState<string | null>(null)
+  const [presetNote, setPresetNote] = useState<string | null>(null)
 
   const gameFault = getScenario(game.scenarioId).fault
   // Qué fallas tiene el pedal que suena ahora mismo.
@@ -116,6 +126,9 @@ export function Workbench({ pedal }: WorkbenchProps) {
           <button role="tab" aria-selected={mode === 'juego'} className={mode === 'juego' ? 'mode on' : 'mode'} onClick={() => setMode('juego')}>
             Pedal roto
           </button>
+          <button role="tab" aria-selected={mode === 'decorar'} className={mode === 'decorar' ? 'mode on' : 'mode'} onClick={() => setMode('decorar')}>
+            Decorar
+          </button>
         </div>
       </header>
 
@@ -124,9 +137,16 @@ export function Workbench({ pedal }: WorkbenchProps) {
           <section className="panel">
             <PedalVisual
               pedal={pedal}
+              decor={decor}
               knobs={knobs}
               bypass={bypass}
               flipped={flipped}
+              decorating={mode === 'decorar'}
+              selectedSticker={selectedSticker}
+              activeStage={mode === 'taller' && flipped ? hoverStage : null}
+              onSelectSticker={selectSticker}
+              onMoveSticker={(id, x, y) => updateSticker(pedal.id, id, { x, y })}
+              onRemoveSticker={(id) => removeSticker(pedal.id, id)}
               selectedRef={selectedRef}
               showValues={mode === 'taller'}
               highlightRef={gameOver ? gameFault.ref : null}
@@ -135,9 +155,11 @@ export function Workbench({ pedal }: WorkbenchProps) {
               onSelect={selectRef}
             />
             <div className="btn-row center">
-              <button className="chip" onClick={() => setFlipped(!flipped)}>
-                {flipped ? 'Ver el frente' : 'Dar vuelta: ver la placa'}
-              </button>
+              {mode !== 'decorar' && (
+                <button className="chip" onClick={() => setFlipped(!flipped)}>
+                  {flipped ? 'Ver el frente' : 'Dar vuelta: ver la placa'}
+                </button>
+              )}
               <button className="chip" onClick={() => setBypass(!bypass)}>
                 {bypass ? 'Prender pedal' : 'Apagar pedal (bypass)'}
               </button>
@@ -145,6 +167,23 @@ export function Workbench({ pedal }: WorkbenchProps) {
             {flipped && (
               <div className="info-box">
                 <ComponentInfo pedal={pedal} />
+              </div>
+            )}
+            {!flipped && mode === 'taller' && pedal.presets && pedal.presets.length > 0 && (
+              <div className="presets">
+                {pedal.presets.map((pr) => (
+                  <button
+                    key={pr.id}
+                    className="chip active-ok"
+                    onClick={() => {
+                      setKnobs(pr.knobs)
+                      setPresetNote(pr.note)
+                    }}
+                  >
+                    {pr.name}
+                  </button>
+                ))}
+                {presetNote && <p className="hint">{presetNote}</p>}
               </div>
             )}
             {!flipped && mode === 'taller' && (
@@ -183,15 +222,18 @@ export function Workbench({ pedal }: WorkbenchProps) {
 
         <div className="col">
           {mode === 'juego' && <GamePanel pedal={pedal} />}
+          {mode === 'decorar' && <DecorPanel pedal={pedal} />}
 
+          {mode !== 'decorar' && (
           <section className="panel">
             <h2>Espectro en vivo</h2>
             <Spectrum active={playing} />
             <p className="hint">
-              Gris: lo que entra al pedal. Verde: lo que sale. Un pedal que distorsiona agrega armónicas: picos nuevos en múltiplos de cada
+              Celeste: lo que entra al pedal. Verde: lo que sale. Un pedal que distorsiona agrega armónicas: picos nuevos en múltiplos de cada
               nota.
             </p>
           </section>
+          )}
 
           {mode === 'taller' && (
             <>
@@ -205,16 +247,12 @@ export function Workbench({ pedal }: WorkbenchProps) {
 
               <section className="panel">
                 <h2>El circuito, etapa por etapa</h2>
+                <SignalFlow pedal={pedal} playing={playing} />
+                <p className="hint">Pasá el mouse por un bloque para ver sus componentes en la placa (dando vuelta el pedal) y tocalo para abrir las cuentas.</p>
                 <div className="chain">
-                  <div className="chain-end">Entrada: acorde sintetizado</div>
                   {pedal.stages.map((stage, i) => (
-                    <div key={stage.id}>
-                      <div className="chain-arrow">↓</div>
-                      <StageCard stage={stage} knobs={knobs} defaultOpen={i === 0} />
-                    </div>
+                    <StageCard key={stage.id} stage={stage} knobs={knobs} defaultOpen={i === 0} />
                   ))}
-                  <div className="chain-arrow">↓</div>
-                  <div className="chain-end">Salida</div>
                 </div>
               </section>
 

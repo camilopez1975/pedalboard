@@ -1,3 +1,4 @@
+import { useApp } from '../store.ts'
 import { explainStage } from '../model/explain.ts'
 import type { Knobs, StageDef } from '../model/types.ts'
 
@@ -10,8 +11,9 @@ interface StageCardProps {
 /** Una etapa del circuito: qué hace, con qué componentes y las cuentas con los valores actuales. */
 export function StageCard({ stage, knobs, defaultOpen = false }: StageCardProps) {
   const info = explainStage(stage, knobs)
+  const setHover = useApp((s) => s.setHoverStage)
   return (
-    <details className="stage" open={defaultOpen}>
+    <details className="stage" id={`stage-${stage.id}`} data-type={stage.type} open={defaultOpen} onMouseEnter={() => setHover(stage.id)} onMouseLeave={() => setHover(null)}>
       <summary>
         <span className="stage-name">{stage.name}</span>
         <span className="stage-desc">{stage.description}</span>

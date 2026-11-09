@@ -10,6 +10,8 @@ interface BoardProps {
   showValues: boolean
   /** Componente a marcar en rojo (cuando el juego terminó). */
   highlightRef?: string | null
+  /** Etapa cuyos componentes se destacan (el resto se atenúa). */
+  activeStage?: string | null
 }
 
 const BAND_HEX: Record<string, string> = {
@@ -112,7 +114,7 @@ function shape(c: BoardComponent, ohms: number | undefined): ReactNode {
 }
 
 /** Placa de circuito impreso del pedal. Cada componente se puede tocar para ver qué es y qué hace. */
-export function Board({ pedal, selectedRef, onSelect, showValues, highlightRef }: BoardProps) {
+export function Board({ pedal, selectedRef, onSelect, showValues, highlightRef, activeStage }: BoardProps) {
   return (
     <svg className="board" viewBox="0 0 520 300" role="group" aria-label={`Placa del ${pedal.name}`} onClick={() => onSelect(null)}>
       <defs>
@@ -157,7 +159,7 @@ export function Board({ pedal, selectedRef, onSelect, showValues, highlightRef }
           <g
             key={c.ref}
             transform={`translate(${c.x} ${c.y})`}
-            className={`b-comp${selected ? ' selected' : ''}${bad ? ' bad' : ''}`}
+            className={`b-comp${selected ? ' selected' : ''}${bad ? ' bad' : ''}${activeStage && c.stageId !== activeStage ? ' dim' : ''}${activeStage && c.stageId === activeStage ? ' lit' : ''}`}
             role="button"
             tabIndex={0}
             aria-label={`${c.ref}${showValues ? ' ' + componentLabel(pedal, c) : ''}`}

@@ -1,12 +1,13 @@
-import type { PedalDef } from '../types.ts'
+import type { PedalDef, PedalLook } from '../types.ts'
 import { overdriveTS } from './tube-screamer.ts'
 
 /** Pedales que todavía no están armados: aparecen en el selector como "Próximamente". */
-const comingSoon = (id: string, name: string, subtitle: string, color: string): PedalDef => ({
+const comingSoon = (id: string, name: string, subtitle: string, look: PedalLook): PedalDef => ({
   id,
   name,
   subtitle,
-  color,
+  color: look.body,
+  look,
   available: false,
   knobs: [],
   stages: [],
@@ -16,8 +17,32 @@ const comingSoon = (id: string, name: string, subtitle: string, color: string): 
 
 export const PEDALS: PedalDef[] = [
   overdriveTS,
-  comingSoon('fuzz-bigmuff', 'Fuzz tipo Big Muff', 'Sustain largo y sonido espeso', '#9aa0a6'),
-  comingSoon('fuzz-face', 'Fuzz tipo Fuzz Face', 'Fuzz de dos transistores, cálido y rasposo', '#c0392b'),
+  comingSoon('fuzz-bigmuff', 'Fuzz tipo Big Muff', 'Sustain largo y sonido espeso', {
+    shape: 'box',
+    body: '#d8dde6',
+    finish: 'metalico',
+    pattern: 'ninguno',
+    patternColor: '#000000',
+    knobStyle: 'negra',
+    ledColor: '#ff2a2a',
+    textColor: '#1a1d24',
+    title: 'Big Fuzz',
+    subtitle: 'Sustainer',
+    knobLabels: ['Volume', 'Tone', 'Sustain'],
+  }),
+  comingSoon('fuzz-face', 'Fuzz tipo Fuzz Face', 'Fuzz de dos transistores, cálido y rasposo', {
+    shape: 'round',
+    body: '#e63946',
+    finish: 'esmalte',
+    pattern: 'ninguno',
+    patternColor: '#ffffff',
+    knobStyle: 'blanca',
+    ledColor: '#ff2a2a',
+    textColor: '#fff4f4',
+    title: 'Cara Fuzz',
+    subtitle: 'Fuzz',
+    knobLabels: ['Volume', 'Fuzz'],
+  }),
 ]
 
 export function getPedal(id: string): PedalDef | undefined {

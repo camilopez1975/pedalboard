@@ -9,7 +9,7 @@ import { applyFaults, componentValue, measure } from '../src/model/board.ts'
 import { compilePedal } from '../src/model/compile.ts'
 import { num, sci, si } from '../src/model/format.ts'
 import { TS_SCENARIOS, computeScore } from '../src/model/game.ts'
-import { defaultKnobs } from '../src/model/pedals/index.ts'
+import { defaultKnobs, PEDALS } from '../src/model/pedals/index.ts'
 import { overdriveTS } from '../src/model/pedals/tube-screamer.ts'
 
 const FS = 48000
@@ -264,4 +264,50 @@ test('código de colores de resistencias', async () => {
   assert.deepEqual(resistorBands(51000), ['green', 'brown', 'orange', 'gold'])
   assert.deepEqual(resistorBands(1000), ['brown', 'black', 'red', 'gold'])
   assert.deepEqual(resistorBands(10000), ['brown', 'black', 'orange', 'gold'])
+})
+
+test('decoración: valores de fábrica, validación de lo guardado y stickers', async () => {
+  const { defaultDecor, parseDecor, makeSticker, sanitizeSticker, MAX_STICKERS } = await import('../src/model/decor.ts')
+  const ts = PEDALS[0]
+  const base = defaultDecor(ts.look)
+  assert.equal(base.body, ts.look.body)
+  assert.equal(base.stickers.length, 0)
+
+  // Lo guardado con basura vuelve a valores válidos; los stickers inválidos se descartan.
+  const messy = parseDecor(
+    {
+      body: 'rojo',
+      finish: 'cromado',
+      pattern: 'rayas',
+      knobStyle: 'dorada',
+      title: 'x'.repeat(100),
+      stickers: [{ kind: 'estrella', x: 500, y: -4, scale: 99, rot: -90, color: '#ff0000' }, { kind: 'dragon' }, null, ...Array.from({ length: 40 }, () => ({ kind: 'rayo' }))],
+    },
+    ts,
+  )
+  assert.equal(messy.body, base.body)
+  assert.equal(messy.finish, base.finish)
+  assert.equal(messy.pattern, 'rayas')
+  assert.equal(messy.knobStyle, 'dorada')
+  assert.equal(messy.title.length, 22)
+  assert.ok(messy.stickers.length <= MAX_STICKERS)
+  const s0 = messy.stickers[0]
+  assert.deepEqual([s0.x, s0.y, s0.scale, s0.rot], [100, 0, 3.5, 270])
+  assert.ok(messy.stickers.every((s) => s.kind !== 'dragon'))
+
+  assert.deepEqual(parseDecor(undefined, ts), base)
+  const t = sanitizeSticker({ ...makeSticker('texto', '#ffffff'), text: 'a'.repeat(50) })
+  assert.equal(t.text.length, 24)
+})
+
+test('cada pedal tiene aspecto y los ajustes sugeridos son válidos', () => {
+  for (const p of PEDALS) {
+    assert.ok(/^#[0-9a-f]{6}$/i.test(p.look.body), p.id)
+    assert.ok(p.look.knobLabels.length >= 2, p.id)
+    for (const pr of p.presets ?? []) {
+      for (const k of p.knobs) assert.ok(pr.knobs[k.id] >= 0 && pr.knobs[k.id] <= 1, `${p.id}/${pr.id}/${k.id}`)
+    }
+  }
+  const srv = PEDALS[0].presets.find((x) => x.id === 'srv')
+  assert.ok(srv.knobs.drive < 0.3 && srv.knobs.level > 0.8, 'SRV: Drive bajo y Level alto')
 })

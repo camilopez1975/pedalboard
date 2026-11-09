@@ -143,12 +143,42 @@ export interface Fault {
   mode: FaultMode
 }
 
+// --- Aspecto ---------------------------------------------------------------------------------------
+
+export type PedalShape = 'box' | 'round'
+/** Estilo de las perillas. */
+export type KnobStyle = 'negra' | 'blanca' | 'cromada' | 'dorada' | 'roja'
+/** Terminación de la pintura del gabinete. */
+export type Finish = 'esmalte' | 'metalico' | 'mate'
+/** Dibujo que se superpone a la pintura. */
+export type Pattern = 'ninguno' | 'rayas' | 'puntos' | 'cuadros' | 'rombos'
+
+/** Cómo se ve un pedal de fábrica (el usuario después lo puede decorar). */
+export interface PedalLook {
+  shape: PedalShape
+  body: string
+  finish: Finish
+  pattern: Pattern
+  patternColor: string
+  knobStyle: KnobStyle
+  ledColor: string
+  textColor: string
+  /** Texto grande de la chapa. */
+  title: string
+  subtitle: string
+  /** Rótulos de las perillas (se usan para dibujar el pedal en la pedalera aunque no esté armado). */
+  knobLabels: string[]
+}
+
 export interface PedalDef {
   id: string
   name: string
   subtitle: string
   /** Color del gabinete. */
   color: string
+  look: PedalLook
+  /** Ajustes de perillas sugeridos (por ejemplo, de un guitarrista famoso). */
+  presets?: { id: string; name: string; note: string; knobs: Knobs }[]
   /** false = todavía no está armado (se muestra como "Próximamente"). */
   available: boolean
   knobs: KnobDef[]
