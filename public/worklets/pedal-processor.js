@@ -111,6 +111,9 @@ function solveFeedbackVoltage(b, gTot, isPos, isNeg, invA, guess) {
   return v
 }
 
+/** Tope de seguridad de la salida, en V. El motor de audio atenúa por MONITOR_GAIN, así que ±2 V quedan en ±1 de escala completa. */
+const OUTPUT_LIMIT = 2
+
 export class PedalCore {
   constructor(fs) {
     this.fs = fs
@@ -218,7 +221,7 @@ export class PedalCore {
         this.reset()
         y = 0
       }
-      output[i] = y > 1 ? 1 : y < -1 ? -1 : y // tope de seguridad: nunca más fuerte que 0 dBFS
+      output[i] = y > OUTPUT_LIMIT ? OUTPUT_LIMIT : y < -OUTPUT_LIMIT ? -OUTPUT_LIMIT : y // tope de seguridad (en voltios; el motor lo baja a ≤ 0 dBFS)
     }
   }
 

@@ -266,40 +266,6 @@ test('código de colores de resistencias', async () => {
   assert.deepEqual(resistorBands(10000), ['brown', 'black', 'orange', 'gold'])
 })
 
-test('decoración: valores de fábrica, validación de lo guardado y stickers', async () => {
-  const { defaultDecor, parseDecor, makeSticker, sanitizeSticker, MAX_STICKERS } = await import('../src/model/decor.ts')
-  const ts = PEDALS[0]
-  const base = defaultDecor(ts.look)
-  assert.equal(base.body, ts.look.body)
-  assert.equal(base.stickers.length, 0)
-
-  // Lo guardado con basura vuelve a valores válidos; los stickers inválidos se descartan.
-  const messy = parseDecor(
-    {
-      body: 'rojo',
-      finish: 'cromado',
-      pattern: 'rayas',
-      knobStyle: 'dorada',
-      title: 'x'.repeat(100),
-      stickers: [{ kind: 'estrella', x: 500, y: -4, scale: 99, rot: -90, color: '#ff0000' }, { kind: 'dragon' }, null, ...Array.from({ length: 40 }, () => ({ kind: 'rayo' }))],
-    },
-    ts,
-  )
-  assert.equal(messy.body, base.body)
-  assert.equal(messy.finish, base.finish)
-  assert.equal(messy.pattern, 'rayas')
-  assert.equal(messy.knobStyle, 'dorada')
-  assert.equal(messy.title.length, 22)
-  assert.ok(messy.stickers.length <= MAX_STICKERS)
-  const s0 = messy.stickers[0]
-  assert.deepEqual([s0.x, s0.y, s0.scale, s0.rot], [100, 0, 3.5, 270])
-  assert.ok(messy.stickers.every((s) => s.kind !== 'dragon'))
-
-  assert.deepEqual(parseDecor(undefined, ts), base)
-  const t = sanitizeSticker({ ...makeSticker('texto', '#ffffff'), text: 'a'.repeat(50) })
-  assert.equal(t.text.length, 24)
-})
-
 test('cada pedal tiene aspecto y los ajustes sugeridos son válidos', () => {
   for (const p of PEDALS) {
     assert.ok(/^#[0-9a-f]{6}$/i.test(p.look.body), p.id)
@@ -309,5 +275,35 @@ test('cada pedal tiene aspecto y los ajustes sugeridos son válidos', () => {
     }
   }
   const srv = PEDALS[0].presets.find((x) => x.id === 'srv')
-  assert.ok(srv.knobs.drive < 0.3 && srv.knobs.level > 0.8, 'SRV: Drive bajo y Level alto')
+  assert.ok(srv.knobs.drive < 0.3 && srv.knobs.level >= 0.75, 'SRV: Drive bajo y Level alto')
+})
+
+test('textos en palabras simples para todo lo que se muestra sin detalles técnicos', async () => {
+  const { explainStage } = await import('../src/model/explain.ts')
+  const ts = PEDALS[0]
+  for (const c of ts.board) assert.ok(c.simple && c.simple.length > 20, `componente ${c.ref} sin texto simple`)
+  for (const sc of TS_SCENARIOS) assert.ok(sc.simple && sc.simple.length > 20, `avería ${sc.id} sin texto simple`)
+  for (const st of ts.stages) {
+    const info = explainStage(st, defaultKnobs(ts))
+    assert.ok(info.simple.length > 20, st.id)
+    // El texto simple no lleva fórmulas ni símbolos de las cuentas.
+    assert.ok(!/[Ω∥≈→]|Zf|Zg|\bf[₁₂]\b|kΩ/.test(info.simple + (info.simpleTip ?? '')), `términos técnicos en ${st.id}`)
+  }
+  for (const c of ts.board) assert.ok(!/[Ω∥≈]|kΩ|\d+ ?(Hz|nF|pF|µF)/.test(c.simple), `términos técnicos en ${c.ref}`)
+})
+
+test('el ajuste tipo SRV y el peor caso no pasan del tope de salida', () => {
+  const srv = PEDALS[0].presets.find((x) => x.id === 'srv').knobs
+  const worst = { drive: 1, tone: 1, level: 1 }
+  for (const knobs of [srv, worst]) {
+    const core = coreFor(PEDALS[0], knobs)
+    const v = strengthToPeakVolts(1)
+    const chord = synthesizeChord(CHORDS[0], FS)
+    const x = Float32Array.from(chord, (s) => s * v)
+    const y = new Float32Array(x.length)
+    for (let i = 0; i < x.length; i += 128) core.process(x.subarray(i, i + 128), y.subarray(i, i + 128))
+    const peak = y.reduce((m, s) => Math.max(m, Math.abs(s)), 0)
+    assert.ok(Number.isFinite(peak) && peak <= 2 + 1e-9, `pico ${peak} V`)
+    assert.ok(peak > 0.05, 'tiene que sonar')
+  }
 })

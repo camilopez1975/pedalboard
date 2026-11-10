@@ -10,6 +10,9 @@ export interface PedalConfig {
  * Motor de audio: acorde sintetizado → ganancia de entrada (la "pegada") → procesador del pedal → salida.
  * Un solo objeto para toda la app. El audio solo puede arrancar después de un gesto del usuario (un clic).
  */
+/** Atenuación de monitoreo: 1 V del modelo = 0,5 de escala completa. Con el tope del procesador (±2 V) la salida nunca pasa de 0 dBFS. */
+const MONITOR_GAIN = 0.5
+
 class AudioEngine {
   private ctx: AudioContext | null = null
   private pedalNode: AudioWorkletNode | null = null
@@ -64,7 +67,12 @@ class AudioEngine {
     const analyserOut = makeAnalyser()
     inputGain.connect(pedalNode)
     inputGain.connect(analyserIn)
-    pedalNode.connect(ctx.destination)
+    // Margen de seguridad: la salida del pedal puede pasar de 1 V (Level alto), pero la placa de sonido no admite más de 1.
+    // El mismo atenuador vale con el pedal apagado, así que se pueden comparar los volúmenes.
+    const monitor = ctx.createGain()
+    monitor.gain.value = MONITOR_GAIN
+    pedalNode.connect(monitor)
+    monitor.connect(ctx.destination)
     pedalNode.connect(analyserOut)
     pedalNode.port.postMessage(this.config)
     this.ctx = ctx

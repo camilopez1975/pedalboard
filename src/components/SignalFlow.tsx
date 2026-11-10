@@ -11,18 +11,14 @@ export const STAGE_STYLE: Record<StageDef['type'], { color: string; short: strin
 interface SignalFlowProps {
   pedal: PedalDef
   playing: boolean
+  /** Etapa elegida (se muestra resaltada). */
+  focus: string | null
+  onPick: (stageId: string) => void
 }
 
 /** Camino de la señal: guitarra → cada etapa → ampli. Al pasar el mouse se resaltan sus componentes en la placa. */
-export function SignalFlow({ pedal, playing }: SignalFlowProps) {
+export function SignalFlow({ pedal, playing, focus, onPick }: SignalFlowProps) {
   const setHover = useApp((s) => s.setHoverStage)
-
-  function openStage(id: string) {
-    const el = document.getElementById(`stage-${id}`) as HTMLDetailsElement | null
-    if (!el) return
-    el.open = true
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
 
   return (
     <div className={playing ? 'flow playing' : 'flow'}>
@@ -36,16 +32,16 @@ export function SignalFlow({ pedal, playing }: SignalFlowProps) {
           <div key={stage.id} className="flow-item">
             <div className="flow-wire" aria-hidden="true" />
             <button
-              className="flow-block"
+              className={focus === stage.id ? 'flow-block picked' : 'flow-block'}
               style={{ '--c': st.color } as never}
               onMouseEnter={() => setHover(stage.id)}
               onMouseLeave={() => setHover(null)}
               onFocus={() => setHover(stage.id)}
               onBlur={() => setHover(null)}
-              onClick={() => openStage(stage.id)}
+              onClick={() => onPick(stage.id)}
             >
               <strong>{st.short}</strong>
-              <span>ver cuentas</span>
+              <span>ver qué hace</span>
             </button>
           </div>
         )

@@ -35,7 +35,6 @@ function Jack({ label }: { label: string }) {
 /** Pantalla de inicio: una pedalera con los pedales cableados; se elige uno tocándolo. */
 export function Home() {
   const openPedal = useApp((s) => s.openPedal)
-  const decor = useApp((s) => s.decor)
 
   return (
     <main className="page home">
@@ -43,7 +42,7 @@ export function Home() {
         <h1>
           Armá tu <span className="grad">pedal</span>
         </h1>
-        <p>Elegí un pedal de tu pedalera, girá las perillas, escuchalo en vivo y descubrí qué pasa adentro. Después decoralo a tu gusto.</p>
+        <p>Elegí un pedal de tu pedalera, girá las perillas, escuchalo en vivo y descubrí qué pasa adentro. </p>
       </header>
 
       <section className="pbd" aria-label="Pedalera">
@@ -65,7 +64,7 @@ export function Home() {
                     {i > 0 && <Cable color={CABLE_COLORS[i % CABLE_COLORS.length]} />}
                     <div className={pedal.available ? 'board-pedal' : 'board-pedal soon'} onClick={open} onKeyDown={key} role="button" tabIndex={pedal.available ? 0 : -1} aria-disabled={!pedal.available} aria-label={pedal.available ? `Abrir ${pedal.name}` : `${pedal.name}: próximamente`}>
                       <div className={`pedal-box shape-${pedal.look.shape}`}>
-                        <PedalFace pedal={pedal} decor={decor[pedal.id]} bypass={false} interactive={false} />
+                        <PedalFace pedal={pedal} bypass={false} interactive={false} />
                         {!pedal.available && <span className="ribbon">Próximamente</span>}
                       </div>
                       <div className="board-label">

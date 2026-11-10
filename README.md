@@ -27,9 +27,8 @@ src/model/compile.ts                 Pedal + perillas → bloques para el proces
 src/model/explain.ts                 Textos y cuentas paso a paso de cada etapa.
 src/audio/chord.ts                   Acorde de guitarra sintetizado (Karplus-Strong).
 src/audio/engine.ts                  Conecta todo en el navegador (Web Audio).
-src/components/                      Interfaz (React): PedalVisual (3D), Board (placa), GamePanel, Spectrum…
+src/components/                      Interfaz (React): Home, Workbench, PedalFace/PedalVisual, Board (placa), Game, Spectrum…
 src/model/board.ts, game.ts          Placa, fallas, multímetro y averías del juego.
-src/model/decor.ts                   Decoración: colores, acabados, stickers, validación y guardado local.
 tests/                               Pruebas con el test runner de Node.
 ```
 
@@ -42,19 +41,19 @@ Convención de escala del audio: 1,0 digital = 1 V. La "pegada" del acorde va de
 ## Pantallas
 
 - **Inicio**: una pedalera con los tres pedales cableados entre la guitarra y el ampli. Se abre el Tube Screamer; el Big Muff y el Fuzz Face
-  aparecen como "Próximamente". Cada pedal se dibuja con la decoración que le hayas puesto.
-- **Banco de trabajo**: el pedal en 3D (se inclina con el mouse y se da vuelta para ver la placa) y, a la derecha, lo que corresponda al modo.
+  aparecen como "Próximamente".
+- **Banco de trabajo**: una ventana al estilo GarageBand. A la izquierda, cómo tocar (acorde, pegada, encendido/bypass) y el espectro en vivo.
+  Al centro, el pedal **quieto** (no se mueve con el mouse); un selector Frente / Placa lo da vuelta. A la derecha, lo que corresponda al modo.
+  Arriba, el interruptor **Detalles técnicos**: apagado muestra todo en palabras simples; encendido suma valores, fórmulas, cuentas y la
+  respuesta en frecuencia. Se acuerda de tu elección en el navegador (`localStorage`).
 
 ## Modos
 
-- **Decorar**: color y acabado (esmalte, metalizado, mate), dibujos (rayas, puntos, cuadros, rombos), perillas (negras, blancas, cromadas,
-  doradas, rojas), nombre y subtítulo de la chapa, color del LED y stickers (14 tipos, incluido uno de texto) que se arrastran, giran y
-  cambian de tamaño. Se guarda en el navegador (`localStorage`); se puede volver al pedal de fábrica.
-
-- **Taller**: perillas, espectro en vivo, respuesta en frecuencia y el circuito etapa por etapa con las cuentas. Podés dar vuelta el pedal para ver
-  la placa, tocar un componente (qué es, qué valor tiene) y simular que se abre o se pone en corto para escuchar qué le pasa al sonido.
-- **Pedal roto**: el "cliente" cuenta el síntoma. Hay que escuchar, mirar el espectro, dar vuelta el pedal, medir componentes con el multímetro
-  y diagnosticar cuál falla y cómo. Empezás con 100 puntos: −10 por medición, −25 por diagnóstico equivocado. Hay 6 averías (`src/model/game.ts`).
+- **Taller**: perillas, ajustes guardados del pedal (por ejemplo "Ajuste tipo Stevie Ray Vaughan": las perillas se mueven suavemente hasta ahí) y el
+  circuito etapa por etapa. Al dar vuelta el pedal podés tocar un componente (qué es y qué hace) y simular que se abre o se pone en corto para
+  escuchar qué le pasa al sonido.
+- **Pedal roto**: el "cliente" cuenta el síntoma y se resuelve en tres pasos: escuchar, medir con el multímetro (con libreta de anotaciones) y
+  diagnosticar cuál falla y cómo. Empezás con 100 puntos: −10 por medición, −25 por diagnóstico equivocado. Hay 6 averías (`src/model/game.ts`).
 
 ## Qué tan fiel es
 
@@ -66,6 +65,8 @@ Convención de escala del audio: 1,0 digital = 1 V. La "pegada" del acorde va de
   usaba Stevie Ray Vaughan, que no coinciden en los números exactos ni en si era un TS808 o un TS9: es un punto de partida.
 - El control de tono es una **reconstrucción**: no está verificado el cableado exacto del potenciómetro ni los designadores R9/R10, y la
   disposición de la placa dibujada es ilustrativa. Los demás valores (Rg, Cg, Rf, Drive, Cf, R7/C5, R8/C6, potenciómetros) coinciden con análisis publicados.
+- La salida del procesador se limita a ±2 V y el motor la baja a la mitad antes de los parlantes, para que los ajustes de mucha ganancia no saturen
+  digitalmente la placa de sonido.
 - No se modelan ruido, ancho de banda del operacional, etapa de entrada, buffer de salida, bypass ni batería.
 - Los valores son de referencia: verificalos con un esquemático antes de construir.
 

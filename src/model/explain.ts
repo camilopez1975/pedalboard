@@ -5,6 +5,10 @@ import type { Knobs, StageDef } from './types.ts'
 export interface StageExplanation {
   /** Qué hace la etapa, en palabras. */
   what: string
+  /** Lo mismo que `what`, en palabras simples y sin cuentas. */
+  simple: string
+  /** Consejo corto sin cuentas. */
+  simpleTip?: string
   /** Valores de los componentes tal como están ahora. */
   components: string[]
   /** Cuentas paso a paso, con unidades en cada reemplazo y conversión a SI explícita. */
@@ -21,6 +25,9 @@ export function explainStage(stage: StageDef, knobs: Knobs): StageExplanation {
       const pot = potResistance(stage.rfPot, knobs)
       const vOut = 0.6
       return {
+        simple:
+          'Acá se hace la distorsión. El pedal amplifica la guitarra (sobre todo los medios) y después dos diodos recortan los picos de la señal: ese recorte es lo que suena a distorsión. El Drive controla cuánto se amplifica antes de recortar.',
+        simpleTip: 'Tocá suave y fuerte: con la guitarra suave distorsiona menos, con la guitarra fuerte los diodos recortan más.',
         what:
           'El operacional amplifica la señal con ganancia 1 + Zf/Zg. Por debajo de f₁ casi no amplifica (ganancia 1) y por encima amplifica 1 + Rf/Rg; ' +
           'por encima de f₂ la ganancia vuelve a caer. Eso da la "joroba de medios". Los diodos están en la realimentación: cuando la tensión sobre Zf ' +
@@ -47,6 +54,9 @@ export function explainStage(stage: StageDef, knobs: Knobs): StageExplanation {
       const fc2 = 1 / (2 * Math.PI * stage.r8 * stage.c6)
       const p = toneNetwork(stage, knobs)
       return {
+        simple:
+          'El control de tono. Hacia la derecha deja pasar más agudos (más brillo); hacia la izquierda los suaviza y el sonido queda más oscuro.',
+        simpleTip: 'Probá girar el Tone mientras suena el acorde y mirá cómo cambian los picos agudos en el espectro.',
         what:
           'Primero un pasa-bajos fijo (R7 y C5) que suaviza los agudos que dejó el recorte. Después, un operacional con el potenciómetro de tono entre sus dos entradas: ' +
           'del lado de los graves el cursor carga la entrada y recorta más los agudos (pasa-bajos de segundo orden); del lado de los agudos, esa rama (R8 y C6) hace que vuelvan a subir los agudos. ' +
@@ -68,6 +78,9 @@ export function explainStage(stage: StageDef, knobs: Knobs): StageExplanation {
       const v = levelValues(stage, knobs)
       const law = stage.taper === 'log' ? 'posición²' : 'posición'
       return {
+        simple:
+          'El volumen final del pedal. Subirlo no cambia la distorsión, solo cuánto sale hacia el ampli.',
+        simpleTip: 'Subí el Level para empujar más al ampli; bajalo si prendido suena mucho más fuerte que apagado.',
         what:
           stage.taper === 'log'
             ? 'Sube o baja el volumen de salida con un potenciómetro logarítmico: la ganancia crece con el cuadrado de la posición.'

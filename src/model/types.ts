@@ -128,8 +128,10 @@ export interface BoardComponent {
   kind: ComponentKind
   stageId?: string
   param?: ComponentParam
-  /** Para qué sirve, en una frase. */
+  /** Para qué sirve, con los términos técnicos. */
   role: string
+  /** Para qué sirve, en palabras simples (es lo que se muestra salvo que se pidan los detalles técnicos). */
+  simple?: string
   /** Posición en la placa (viewBox 520 × 300) y giro en grados. */
   x: number
   y: number
@@ -150,16 +152,12 @@ export type PedalShape = 'box' | 'round'
 export type KnobStyle = 'negra' | 'blanca' | 'cromada' | 'dorada' | 'roja'
 /** Terminación de la pintura del gabinete. */
 export type Finish = 'esmalte' | 'metalico' | 'mate'
-/** Dibujo que se superpone a la pintura. */
-export type Pattern = 'ninguno' | 'rayas' | 'puntos' | 'cuadros' | 'rombos'
 
-/** Cómo se ve un pedal de fábrica (el usuario después lo puede decorar). */
+/** Cómo se ve un pedal. */
 export interface PedalLook {
   shape: PedalShape
   body: string
   finish: Finish
-  pattern: Pattern
-  patternColor: string
   knobStyle: KnobStyle
   ledColor: string
   textColor: string
@@ -178,7 +176,7 @@ export interface PedalDef {
   color: string
   look: PedalLook
   /** Ajustes de perillas sugeridos (por ejemplo, de un guitarrista famoso). */
-  presets?: { id: string; name: string; note: string; knobs: Knobs }[]
+  presets?: { id: string; name: string; note: string; detail: string; clock: Record<string, string>; knobs: Knobs }[]
   /** false = todavía no está armado (se muestra como "Próximamente"). */
   available: boolean
   knobs: KnobDef[]

@@ -6,8 +6,10 @@ export interface Scenario {
   /** Lo que cuenta el dueño del pedal. */
   complaint: string
   fault: Fault
-  /** Explicación que se muestra al final. */
+  /** Explicación con los términos técnicos. */
   explanation: string
+  /** La misma explicación, en palabras simples. */
+  simple: string
 }
 
 export const FAULT_MODE_LABEL: Record<FaultMode, string> = {
@@ -22,6 +24,8 @@ export const TS_SCENARIOS: Scenario[] = [
     fault: { ref: 'C3', mode: 'open' },
     explanation:
       'C3 (47 nF) abierto: la rama de Rg a masa queda cortada, Zg → ∞ y la ganancia 1 + Zf/Zg → 1. El operacional deja de amplificar, nada llega a los diodos y el pedal casi no distorsiona.',
+    simple:
+      'C3 es el capacitor que deja pasar la señal a la amplificación. Abierto, esa puerta queda cerrada: el pedal no amplifica y casi no distorsiona.',
   },
   {
     id: 'd2-open',
@@ -29,6 +33,8 @@ export const TS_SCENARIOS: Scenario[] = [
     fault: { ref: 'D2', mode: 'open' },
     explanation:
       'D2 abierto: solo conduce D1. Los picos positivos se recortan en ≈ 0,6 V, pero los negativos siguen creciendo hasta el techo del operacional. Ese recorte asimétrico agrega armónicas pares (como la octava), que se ven en el espectro.',
+    simple:
+      'D2 es uno de los dos diodos que recortan la señal. Sin él, solo se recortan los picos de un lado: el sonido queda desparejo y aparecen armónicas nuevas en el espectro.',
   },
   {
     id: 'c5-open',
@@ -36,6 +42,8 @@ export const TS_SCENARIOS: Scenario[] = [
     fault: { ref: 'C5', mode: 'open' },
     explanation:
       'C5 (0,22 µF) abierto: desaparece el pasa-bajos de ≈ 723 Hz que suaviza el recorte. Pasan todos los agudos que generan los diodos y el sonido queda muy brillante.',
+    simple:
+      'C5 suaviza los agudos filosos. Sin él, pasan todos y el sonido queda áspero y chillón.',
   },
   {
     id: 'p3-open',
@@ -43,6 +51,8 @@ export const TS_SCENARIOS: Scenario[] = [
     fault: { ref: 'P3', mode: 'open' },
     explanation:
       'El cursor del potenciómetro de volumen (P3) está desconectado: no llega señal a la salida, aunque el resto del circuito funcione. Ganancia = 0.',
+    simple:
+      'P3 es el volumen. Con el cursor desconectado, no llega nada a la salida: el LED prende pero no suena.',
   },
   {
     id: 'c4-short',
@@ -50,6 +60,8 @@ export const TS_SCENARIOS: Scenario[] = [
     fault: { ref: 'C4', mode: 'short' },
     explanation:
       'C4 (51 pF) en corto: la impedancia de realimentación Zf queda en cortocircuito, Vf = 0 y Vout = Vin. Ganancia 1: no hay amplificación ni recorte. Ojo: el síntoma es igual al de C3 abierto; el multímetro desempata.',
+    simple:
+      'C4 en corto deja la realimentación como un cable: el pedal no amplifica ni distorsiona. Se parece a C3 abierto; por eso hay que medir para desempatar.',
   },
   {
     id: 'd1-short',
@@ -57,6 +69,8 @@ export const TS_SCENARIOS: Scenario[] = [
     fault: { ref: 'D1', mode: 'short' },
     explanation:
       'D1 en corto: pone en corto toda la realimentación, así que Vf ≈ 0 y la ganancia es 1. Mismo síntoma que C3 abierto o C4 en corto: hace falta medir.',
+    simple:
+      'D1 en corto anula a los diodos: el pedal no amplifica ni distorsiona. Se parece a C3 abierto o a C4 en corto; por eso hay que medir.',
   },
 ]
 
