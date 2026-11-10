@@ -27,23 +27,26 @@ export function PedalFace({ pedal, knobs, bypass, interactive, onKnob, onToggleB
       <div className="jack jack-r" aria-hidden="true">
         <span>OUT</span>
       </div>
+      <div className="face-bevel" aria-hidden="true" />
       <div className="screw s1" aria-hidden="true" />
       <div className="screw s2" aria-hidden="true" />
 
-      <div className="nameplate">
-        <div className="nameplate-title">{look.title}</div>
-        <div className="nameplate-sub">{look.subtitle}</div>
-      </div>
-
-      <div className="knob-row">
+      <div className={`knob-row k${knobDefs.length}`}>
         {knobDefs.map((k) => (
           <Knob key={k.id} label={k.label} value={k.value} variant={look.knobStyle} disabled={!interactive} onChange={(v) => onKnob?.(k.id, v)} />
         ))}
       </div>
       <span className={bypass ? 'led3d' : 'led3d on'} aria-hidden="true" />
-      <button className="stomp" tabIndex={interactive ? 0 : -1} disabled={!interactive} onClick={onToggleBypass} aria-pressed={!bypass} aria-label={bypass ? 'Prender el pedal' : 'Apagar el pedal (bypass)'}>
-        <span className="stomp-top" />
-      </button>
+
+      <div className="stomp-frame">
+        <div className="nameplate">
+          <div className="nameplate-title">{look.title}</div>
+          <div className="nameplate-sub">{look.subtitle}</div>
+        </div>
+        <button className="stomp" tabIndex={interactive ? 0 : -1} disabled={!interactive} onClick={onToggleBypass} aria-pressed={!bypass} aria-label={bypass ? 'Prender el pedal' : 'Apagar el pedal (bypass)'}>
+          <span className="stomp-top" />
+        </button>
+      </div>
     </div>
   )
 }

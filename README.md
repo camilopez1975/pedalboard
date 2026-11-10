@@ -43,7 +43,7 @@ Convención de escala del audio: 1,0 digital = 1 V. La "pegada" del acorde va de
 - **Inicio**: una pedalera con los tres pedales cableados entre la guitarra y el ampli. Se abre el Tube Screamer; el Big Muff y el Fuzz Face
   aparecen como "Próximamente".
 - **Banco de trabajo**: una ventana al estilo GarageBand. A la izquierda, cómo tocar (acorde, pegada, encendido/bypass) y el espectro en vivo.
-  Al centro, el pedal **quieto** (no se mueve con el mouse); un selector Frente / Placa lo da vuelta. A la derecha, lo que corresponda al modo.
+  Al centro, el pedal **quieto** (no se mueve con el mouse), dibujado con relieve: carcasa de esmalte, perillas estriadas con tapa plateada, chapa y pisón con marco negro; un selector Frente / Placa lo da vuelta y muestra la placa con los componentes en volumen (resistencias con sus bandas, capacitores, diodos, integrado y potenciómetros con sombra). A la derecha, lo que corresponda al modo.
   Arriba, el interruptor **Detalles técnicos**: apagado muestra todo en palabras simples; encendido suma valores, fórmulas, cuentas y la
   respuesta en frecuencia. Se acuerda de tu elección en el navegador (`localStorage`).
 

@@ -469,45 +469,22 @@ button {
   fill: #0a2a18;
 }
 .b-lead {
-  stroke: #cfd2d6;
-  stroke-width: 2.5;
+  stroke: #9da1a7;
+  stroke-width: 2.6;
+  stroke-linecap: round;
 }
-.b-resistor {
-  fill: #d8c49a;
-  stroke: #8a7a55;
+.b-lead-shine {
+  stroke: #fff;
+  stroke-opacity: 0.7;
+  stroke-width: 0.9;
+  stroke-linecap: round;
 }
-.b-cap {
-  fill: #e69a2e;
-  stroke: #8a5410;
+.b-lift {
+  transition: transform 0.15s;
 }
-.b-cap-shine {
-  fill: rgba(255, 255, 255, 0.35);
-}
-.b-diode {
-  fill: #e0a24a;
-  stroke: #6b4a14;
-  fill-opacity: 0.9;
-}
-.b-diode-band {
-  fill: #151515;
-}
-.b-pot-body {
-  fill: #cfd2d6;
-  stroke: #6b6e73;
-}
-.b-pot-ring {
-  fill: #2c2e32;
-}
-.b-pot-shaft {
-  fill: #9a9da2;
-}
-.b-pot-mark {
-  stroke: #111;
-  stroke-width: 2;
-}
-.b-chip {
-  fill: #1c1c1f;
-  stroke: #555;
+.b-comp:hover .b-lift,
+.b-comp.selected .b-lift {
+  transform: translate(-1.5px, -2.5px);
 }
 .b-chip-notch {
   fill: none;
@@ -515,9 +492,6 @@ button {
 }
 .b-chip-dot {
   fill: #666;
-}
-.b-pin {
-  fill: #c9ccd1;
 }
 .b-label {
   fill: #eaf5ec;
@@ -994,7 +968,7 @@ select {
 .ribbon {
   position: absolute;
   left: 50%;
-  top: 60%;
+  top: 78%;
   z-index: 10;
   transform: translate(-50%, -50%) rotate(-6deg);
   padding: 5px 14px;
@@ -1581,4 +1555,206 @@ button.preset.on {
 }
 .page.workbench {
   max-width: 1280px;
+}
+
+/* ---- Pedal de caja (más real): marco negro con chapa plateada y pisón de goma ---- */
+.shape-round .stomp-frame {
+  display: contents;
+}
+.shape-box .face-bevel {
+  position: absolute;
+  inset: 7px;
+  border-radius: 12px;
+  z-index: 1;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    inset 0 10px 18px rgba(255, 255, 255, 0.1),
+    inset 0 -14px 20px rgba(0, 0, 0, 0.18);
+}
+.shape-round .face-bevel {
+  display: none;
+}
+.shape-box .screw {
+  left: 50%;
+  right: auto;
+  top: 13px;
+  margin-left: -6px;
+  z-index: 3;
+}
+.shape-box .s2 {
+  display: none;
+}
+.shape-box .knob-row {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+.shape-box .knob-row .knob3d {
+  position: absolute;
+  pointer-events: auto;
+}
+.shape-box .knob-row.k3 .knob3d:nth-child(1) {
+  left: 12%;
+  top: 4.5%;
+}
+.shape-box .knob-row.k3 .knob3d:nth-child(2) {
+  right: 12%;
+  top: 4.5%;
+}
+.shape-box .knob-row.k3 .knob3d:nth-child(3) {
+  left: 50%;
+  margin-left: -42px;
+  top: 19.5%;
+}
+.shape-box .knob-row:not(.k3) {
+  display: flex;
+  justify-content: space-around;
+  inset: auto;
+  left: 4%;
+  right: 4%;
+  top: 8%;
+}
+.shape-box .knob-row:not(.k3) .knob3d {
+  position: static;
+}
+.shape-box .led3d {
+  top: 9%;
+  width: 11px;
+  height: 11px;
+  margin-left: -5.5px;
+}
+.shape-box .jack {
+  top: 40%;
+  width: 16px;
+  height: 52px;
+  border-radius: 5px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 30%, rgba(0, 0, 0, 0.35)),
+    repeating-linear-gradient(0deg, #d7dade 0 2px, #9ea2a8 2px 4px);
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.shape-box .jack::after {
+  content: '';
+  position: absolute;
+  inset: 12px -3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #f1f3f5, #8a8e94 60%, #4c4f54);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
+}
+.shape-box .stomp-frame {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 47%;
+  bottom: 5%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 13px;
+  border-radius: 16px;
+  background: linear-gradient(170deg, #2b2b2f, #08080a);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.18),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.8),
+    0 2px 0 rgba(255, 255, 255, 0.28),
+    0 -2px 6px rgba(0, 0, 0, 0.45);
+}
+.shape-box .nameplate {
+  position: relative;
+  inset: auto;
+  flex: 0 0 38%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 5px;
+  color: var(--plate-ink, #2f55a6);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0 1px, rgba(0, 0, 0, 0.04) 1px 3px),
+    linear-gradient(180deg, #ffffff 0%, #e3e5e9 45%, #b6b9bf 100%);
+  box-shadow:
+    inset 0 1px 1px #fff,
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.shape-box .nameplate-title {
+  font-size: 1.45rem;
+}
+.shape-box .nameplate-sub {
+  margin-top: 2px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+.shape-box .stomp {
+  position: relative;
+  inset: auto;
+  left: auto;
+  bottom: auto;
+  flex: 1;
+  width: auto;
+  height: auto;
+  margin: 0;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #f3f4f6, #b5b8be 60%, #8f939a);
+  box-shadow:
+    0 7px 0 #4d5056,
+    0 12px 10px rgba(0, 0, 0, 0.7),
+    inset 0 2px 1px #fff;
+}
+.shape-box .stomp:active {
+  transform: translateY(5px);
+  box-shadow:
+    0 2px 0 #4d5056,
+    0 5px 6px rgba(0, 0, 0, 0.7),
+    inset 0 2px 1px #fff;
+}
+.shape-box .stomp-top {
+  inset: 7px;
+  border-radius: 5px;
+  background:
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 2px, rgba(255, 255, 255, 0.55) 2px 4px, transparent 4px 17px),
+    linear-gradient(180deg, #fbfbfc, #c9ccd1);
+  box-shadow:
+    inset 0 -4px 6px rgba(0, 0, 0, 0.22),
+    inset 0 1px 1px #fff;
+}
+
+/* Perilla negra: aro estriado negro y tapa plateada con rayita */
+.knob3d[data-style='negra'] .knob3d-cap {
+  background: radial-gradient(circle at 42% 34%, #fdfdfd, #c3c6cb 55%, #8a8e95);
+  box-shadow:
+    inset 0 1px 2px #fff,
+    inset 0 -3px 4px rgba(0, 0, 0, 0.3),
+    0 2px 5px rgba(0, 0, 0, 0.7);
+}
+.knob3d[data-style='negra'] .knob3d-mark {
+  background: #111;
+  box-shadow: none;
+}
+.knob3d[data-style='negra'] .knob3d-knurl {
+  background: repeating-conic-gradient(#3a3a3e 0 5deg, #08080a 5deg 10deg);
+}
+
+/* Al dar vuelta, la tapa se ajusta a la placa para no dejar chapa vacía */
+.scene.shape-box {
+  transition: aspect-ratio 0.6s ease;
+}
+.scene.shape-box.flipped {
+  aspect-ratio: 8 / 5.1;
+}
+
+.face.static .jack span {
+  display: none;
+}
+/* En el banco de trabajo la placa se agranda para poder tocar bien cada componente */
+.gb-area .scene.shape-box.flipped {
+  zoom: 1.3;
 }
